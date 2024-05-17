@@ -5,6 +5,9 @@ import 'Earthquake.dart';
 import 'Accident.dart';
 import 'UGD.dart';
 import "Flood.dart";
+import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 
 
 class EmergencyCallsScreen extends StatefulWidget {
@@ -16,6 +19,34 @@ class EmergencyCallsScreen extends StatefulWidget {
 }
 
 class _EmergencyCallsScreenState extends State<EmergencyCallsScreen> {
+  MapController mapController = MapController();
+  Position? currentPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    Position position = Position(
+      latitude: -6.2088, // Koordinat latitude Jakarta
+      longitude: 106.8456, // Koordinat longitude Jakarta
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      headingAccuracy: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+    );
+
+    setState(() {
+      currentPosition = position;
+    });
+  }
+
   final List<String> emergencyTypesList = [
     'CRIME',
     'FIRE',
@@ -25,7 +56,6 @@ class _EmergencyCallsScreenState extends State<EmergencyCallsScreen> {
     'UGD',
   ];
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,15 +63,21 @@ class _EmergencyCallsScreenState extends State<EmergencyCallsScreen> {
       appBar: AppBar(
         title: const Text(
           'Emergency Calls',
-          style: TextStyle(color: Color.fromARGB(255, 255, 0, 0), fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Color.fromARGB(255, 255, 0, 0),
+            fontWeight: FontWeight.bold,
           ),
-          backgroundColor: Colors.transparent,
+        ),
+        backgroundColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color.fromARGB(193, 241, 96, 96), Color.fromARGB(179, 255, 255, 255)],
+              colors: [
+                Color.fromARGB(193, 241, 96, 96),
+                Color.fromARGB(179, 255, 255, 255)
+              ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -54,9 +90,63 @@ class _EmergencyCallsScreenState extends State<EmergencyCallsScreen> {
                 const SizedBox(height: 5),
                 const LocationRow(),
                 // Add an image at the bottom
-                Image.asset(
-                  'assets/5.jpg',
-                  fit: BoxFit.cover,
+                Container(
+                  height: 300,
+                  child: FlutterMap(
+                    mapController: mapController,
+                    options: MapOptions(
+                      center: LatLng(
+                        currentPosition?.latitude ?? 0,
+                        currentPosition?.longitude ?? 0,
+                      ),
+                      zoom: 13.0,
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'com.example.app',
+                      ),
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            point: LatLng(
+                              currentPosition?.latitude ?? 0,
+                              currentPosition?.longitude ?? 0,
+                            ),
+                            width: 80,
+                            height: 80,
+                            child: const Icon(
+                              Icons.location_on,
+                              color: Colors.red,
+                              size: 40.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                      CircleLayer(
+                        circles: [
+                          CircleMarker(
+                            point: LatLng(
+                              currentPosition?.latitude ?? 0,
+                              currentPosition?.longitude ?? 0,
+                            ),
+                            radius: 1000,
+                            useRadiusInMeter: true,
+                            color: Colors.red.withOpacity(0.3),
+                            borderColor: Colors.black,
+                            borderStrokeWidth: 2,
+                          ),
+                        ],
+                      ),
+                      const RichAttributionWidget(
+                        attributions: [
+                          TextSourceAttribution(
+                            'OpenStreetMap contributors'
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

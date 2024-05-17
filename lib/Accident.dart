@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:avatar_glow/avatar_glow.dart';
 
 class AccidentPage extends StatefulWidget {
   const AccidentPage({super.key});
@@ -12,14 +13,14 @@ class _AccidentPageState extends State<AccidentPage> {
 
   void toggleSOS() {
     setState(() {
-      isEmergency = !isEmergency;
+      isEmergency =!isEmergency;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: (isEmergency == true) ? Color.fromARGB(255, 218, 21, 21) : Colors.white,
+      backgroundColor: (isEmergency == true)? Color.fromARGB(255, 218, 21, 21) : Colors.white,
       appBar: AppBar(
         title: const Text(
           'ACCIDENT',
@@ -31,24 +32,43 @@ class _AccidentPageState extends State<AccidentPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            EmergencyButton(
-              imageSrc: (isEmergency == true)
-                  ? 'assets/icons/sos1.png'
-                  : 'assets/icons/sos.png', // TODO: GANTI INI YAK
-              onTap: () => toggleSOS(),
+           GestureDetector(
+              onTap: toggleSOS,
+              child: AvatarGlow(
+                startDelay: const Duration(milliseconds: 1000),
+                endRadius: 180,
+                glowColor: Colors.black,
+                child: Material(
+                  elevation: 300,
+                  shape: CircleBorder(),
+                  color: Colors.transparent,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: InteractiveViewer(
+                      child: Image.asset(
+                        (isEmergency == true)
+                          ? 'assets/icons/sos1.png'
+                          : 'assets/icons/sos.png',
+                        height: 200,
+                      ),
+                    ),
+                    radius: 100,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(
               height: 20,
             ),
-             Center(
+            Center(
               child: Padding(
                 padding: EdgeInsets.all(50.0),
                 child: Text((isEmergency == true)
-                  ? 'Tetap standby, kami saat ini sedang meminta bantuan terdekat.'
-                  : 'Setelah menekan tombol SOS, kami akan menghubungi rumah sakit dan kantor polisi terdekat.',
-                  style: TextStyle(color: Colors.black,fontSize: 20, fontWeight: FontWeight.bold),
+                   ? 'Tetap standby, kami saat ini sedang meminta bantuan terdekat.'
+                    : 'SOS, kami akan menghubungi rumah sakit dan kantor polisi terdekat.',
+                  style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
-              ), 
+                ),
               ),
             ),
           ],

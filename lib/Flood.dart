@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:avatar_glow/avatar_glow.dart';
 
 class FloodPage extends StatefulWidget {
   const FloodPage({super.key});
@@ -31,24 +32,43 @@ class _FloodPageState extends State<FloodPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            EmergencyButton(
-              imageSrc: (isEmergency == true)
-                  ? 'assets/icons/sos1.png'
-                  : 'assets/icons/sos.png', // TODO: GANTI INI YAK
-              onTap: () => toggleSOS(),
+           GestureDetector(
+              onTap: toggleSOS,
+              child: AvatarGlow(
+                startDelay: const Duration(milliseconds: 1000),
+                endRadius: 180,
+                glowColor: Colors.black,
+                child: Material(
+                  elevation: 300,
+                  shape: CircleBorder(),
+                  color: Colors.transparent,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: InteractiveViewer(
+                      child: Image.asset(
+                        (isEmergency == true)
+                          ? 'assets/icons/sos1.png'
+                          : 'assets/icons/sos.png',
+                        height: 200,
+                      ),
+                    ),
+                    radius: 100,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(
               height: 20,
             ),
-             Center(
+            Center(
               child: Padding(
                 padding: EdgeInsets.all(50.0),
                 child: Text((isEmergency == true)
-                  ? 'Tetap standby, kami saat ini sedang meminta bantuan terdekat.'
-                  : 'Setelah menekan tombol SOS, kami akan menghubungi kantor BNBP dan Basarnas terdekat.',
-                  style: TextStyle(color: Colors.black,fontSize: 20, fontWeight: FontWeight.bold),
+                   ? 'Tetap standby, kami saat ini sedang meminta bantuan terdekat.'
+                    : 'Setelah menekan tombol SOS, kami akan menghubungi kantor BNBP dan Basarnas terdekat.',
+                  style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
-              ), 
+                ),
               ),
             ),
           ],
@@ -57,7 +77,6 @@ class _FloodPageState extends State<FloodPage> {
     );
   }
 }
-
 class EmergencyButton extends StatelessWidget {
   const EmergencyButton({super.key, required this.imageSrc, this.onTap});
   final String imageSrc;
